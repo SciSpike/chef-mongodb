@@ -38,12 +38,18 @@ define :mongodb_instance,
   if node['mongodb']['is_mongos']
     provider = 'mongos'
     # mongos will fail to start if dbpath is set
-    node.default['mongodb']['config']['dbpath'] = nil
     unless node['mongodb']['config']['configdb']
       node.default['mongodb']['config']['configdb'] = params[:configservers].map do |n|
         "#{(n['mongodb']['configserver_url'] || n['fqdn'])}:#{n['mongodb']['config']['port']}"
       end.sort.join(',')
     end
+    ['nojournal','rest','smallfiles','dbpath'].each do |option|
+      node.normal['mongodb']['config'].delete(option) rescue nil
+      node.default['mongodb']['config'].delete(option) rescue nil
+    end
+    
+    puts "HHHELP"
+    puts "hh #{node['mongodb']['config']}"
   else
     provider = 'mongod'
   end
@@ -135,6 +141,7 @@ define :mongodb_instance,
     notifies new_resource.reload_action, "service[#{new_resource.name}]"
   end
 
+
   # config file
   template new_resource.dbconfig_file do
     cookbook new_resource.template_cookbook
@@ -161,15 +168,17 @@ define :mongodb_instance,
   end
 
   # dbpath dir [make sure it exists]
-  directory new_resource.dbpath do
-    owner new_resource.mongodb_user
-    group new_resource.mongodb_group
-    mode '0755'
-    action :create
-    recursive true
-    not_if { new_resource.is_mongos }
+  if !node['mongodb']['is_mongos']
+    directory new_resource.dbpath do
+      owner new_resource.mongodb_user
+      group new_resource.mongodb_group
+      mode '0755'
+      action :create
+      recursive true
+      not_if { new_resource.is_mongos }
+    end
   end
-
+  
   # init script
   template new_resource.init_file do
     cookbook new_resource.template_cookbook
