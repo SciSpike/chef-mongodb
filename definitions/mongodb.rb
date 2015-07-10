@@ -47,9 +47,6 @@ define :mongodb_instance,
       node.normal['mongodb']['config'].delete(option) rescue nil
       node.default['mongodb']['config'].delete(option) rescue nil
     end
-    
-    puts "HHHELP"
-    puts "hh #{node['mongodb']['config']}"
   else
     provider = 'mongod'
   end
