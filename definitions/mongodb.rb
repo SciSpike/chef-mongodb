@@ -221,7 +221,6 @@ define :mongodb_instance,
       block do
         MongoDB.configure_replicaset(new_resource.replicaset, replicaset_name, rs_nodes) unless new_resource.replicaset.nil?
       end
-      action :nothing
     end
 
     ruby_block 'run_config_replicaset' do
@@ -244,10 +243,21 @@ define :mongodb_instance,
 
     ruby_block 'config_sharding' do
       block do
+        require 'net/ping'
+        alive = false
+        until alive
+          p1 = Net::Ping::TCP.new('127.0.0.1', new_resource.port)
+          if p1.ping?
+            p "alive!"
+            alive = true
+          else
+            p "sleeping"
+            sleep 1
+          end
+        end
         MongoDB.configure_shards(node, shard_nodes)
         MongoDB.configure_sharded_collections(node, new_resource.sharded_collections)
       end
-      action :nothing
     end
   end
 end
