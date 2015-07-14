@@ -245,9 +245,11 @@ define :mongodb_instance,
       block do
         require 'net/ping'
         alive = false
+        cnt = 0
         until alive
           p1 = Net::Ping::TCP.new('127.0.0.1', new_resource.port)
-          if p1.ping?
+          cnt = cnt + 1
+          if p1.ping? || cnt >= 5
             p "alive!"
             alive = true
           else
