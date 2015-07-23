@@ -74,8 +74,8 @@ when 'rhel', 'fedora'
   # determine the package name
   # from http://rpm.pbone.net/index.php3?stat=3&limit=1&srodzaj=3&dl=40&search=mongodb
   # verified for RHEL5,6 Fedora 18,19
-  default[:mongodb][:repo] = 'https://repo.mongodb.org/yum/amazon/2013.03/mongodb-org/3.0/x86_64'
-  # for pre 3.0 versions, this should be set to http://downloads-distro.mongodb.org/repo/redhat/os/x86_64
+  default[:mongodb][:repo] = 'https://repo.mongodb.org/yum/amazon/2013.03/mongodb-org/3.0'
+  # for pre 3.0 versions, this should be set to http://downloads-distro.mongodb.org/repo/redhat/os
   default[:mongodb][:package_name] = 'mongodb-server'
   default[:mongodb][:sysconfig_file] = '/etc/sysconfig/mongodb'
   default[:mongodb][:user] = 'mongod'
